@@ -7,3 +7,7 @@ void platform_swap_buffers();
 void platform_destroy_window();
 
 void *platform_load_gl_function(char *funName);
+
+void *platform_load_dynamic_library(const char *dll);
+void *platform_load_dynamic_function(void *dll, const char *funName);
+bool platform_free_dynamic_library(void *dll);

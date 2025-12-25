@@ -10,6 +10,7 @@
 #include <GL/glxext.h>
 
 #include <cstdio>
+#include <dlfcn.h>
 
 static Display *g_display = nullptr;
 static Window g_window = 0;
@@ -240,4 +241,32 @@ void *platform_load_gl_function(char *funName) {
   }
 
   return proc;
+}
+
+void *platform_load_dynamic_library(const char *dll) {
+  char path[256] = {};
+  sprintf(path, "./%s", dll);
+  void *lib = dlopen(path, RTLD_NOW);
+  char *errstr = dlerror();
+  if (errstr != NULL) {
+    FN_ASSERT(false, "A dynamic linking error occurred: (%s)\n", errstr);
+  }
+  FN_ASSERT(lib, "Failed to load lib: %s", dll);
+
+  return lib;
+}
+
+void *platform_load_dynamic_function(void *dll, const char *funName) {
+  void *proc = dlsym(dll, funName);
+  FN_ASSERT(proc, "Failed to load function: %s from lib", funName);
+
+  return proc;
+}
+
+bool platform_free_dynamic_library(void *dll) {
+  FN_ASSERT(dll, "No lib supplied!");
+  int freeResult = dlclose(dll);
+  FN_ASSERT(!freeResult, "Failed to dlclose");
+
+  return (bool)freeResult;
 }
