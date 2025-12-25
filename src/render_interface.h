@@ -16,6 +16,6 @@ struct RenderData {
   Transform transforms[MAX_TRANSFORMS];
 };
 
-extern RenderData renderData;
+extern RenderData *renderData;
 
 void draw_sprite(SpriteID spriteID, Vec2 pos, Vec2 size);

@@ -5,4 +5,4 @@ struct Input {
   int screenSizeY = 0;
 };
 
-extern Input input;
+extern Input *input;

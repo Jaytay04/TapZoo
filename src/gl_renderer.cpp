@@ -124,7 +124,7 @@ bool gl_init(BumpAllocator *transientStorage) {
     // glBindBuffer(GL_SHADER_STORAGE_BUFFER, glContext.transformSBOID);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, glContext.transformSBOID);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Transform) * MAX_TRANSFORMS,
-                 renderData.transforms, GL_DYNAMIC_DRAW);
+                 renderData->transforms, GL_DYNAMIC_DRAW);
   }
 
   // Uniforms
@@ -156,8 +156,8 @@ void gl_render() {
   glClearDepth(0.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glViewport(0, 0, input.screenSizeX, input.screenSizeY);
-  Vec2 screenSize = {(float)input.screenSizeX, (float)input.screenSizeY};
+  glViewport(0, 0, input->screenSizeX, input->screenSizeY);
+  Vec2 screenSize = {(float)input->screenSizeX, (float)input->screenSizeY};
   glUniform2fv(glContext.screenSizeID, 1, &screenSize.x);
 
   /*
@@ -174,12 +174,12 @@ void gl_render() {
   */
   {
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
-                    sizeof(Transform) * renderData.transformCount,
-                    renderData.transforms);
+                    sizeof(Transform) * renderData->transformCount,
+                    renderData->transforms);
 
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderData.transformCount);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderData->transformCount);
 
-    renderData.transformCount = 0;
+    renderData->transformCount = 0;
   }
 
   // Optional sanity check

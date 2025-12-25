@@ -167,8 +167,8 @@ bool platform_create_window(int width, int height, char *title) {
     glXSwapIntervalEXT_ptr(g_display, g_window, 1);
   }
 
-  input.screenSizeX = width;
-  input.screenSizeY = height;
+  input->screenSizeX = width;
+  input->screenSizeY = height;
 
   return true;
 }
@@ -189,8 +189,8 @@ void platform_update_window() {
       break;
 
     case ConfigureNotify:
-      input.screenSizeX = e.xconfigure.width;
-      input.screenSizeY = e.xconfigure.height;
+      input->screenSizeX = e.xconfigure.width;
+      input->screenSizeY = e.xconfigure.height;
       break;
 
     case KeyPress: {

@@ -15,7 +15,7 @@ BumpAllocator Make_Bump_Allocator(size_t size) {
   return ba;
 }
 
-char *bump_alloc(BumpAllocator *bumpAllocator, size_t size) {
+char *Bump_Alloc(BumpAllocator *bumpAllocator, size_t size) {
   char *result = nullptr;
 
   size_t allignedSize =
@@ -104,7 +104,7 @@ char *read_file(const char *filePath, int *fileSize,
   long fileSize2 = get_file_size(filePath);
 
   if (fileSize2) {
-    char *buffer = bump_alloc(bumpAllocator, fileSize2 + 1);
+    char *buffer = Bump_Alloc(bumpAllocator, fileSize2 + 1);
 
     file = read_file(filePath, fileSize, buffer);
   }
@@ -152,7 +152,7 @@ bool copy_file(const char *fileName, const char *outputName,
   long fileSize2 = get_file_size(fileName);
 
   if (fileSize2) {
-    char *buffer = bump_alloc(bumpAllocator, fileSize2 + 1);
+    char *buffer = Bump_Alloc(bumpAllocator, fileSize2 + 1);
 
     return copy_file(fileName, outputName, buffer);
   }
