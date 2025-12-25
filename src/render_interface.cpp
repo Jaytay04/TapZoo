@@ -2,8 +2,6 @@
 #include "assets.h"
 #include "funlib.h"
 
-RenderData *renderData = nullptr;
-
 void draw_sprite(SpriteID spriteID, Vec2 pos, Vec2 size) {
   Sprite sprite = get_sprite(spriteID);
 

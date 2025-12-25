@@ -17,6 +17,7 @@ static update_game_type *update_game_ptr;
 void reload_game_DLL(BumpAllocator *transientStorage);
 
 Input *input = nullptr;
+RenderData *renderData = nullptr;
 
 int main() {
   BumpAllocator transientStorage = Make_Bump_Allocator(MB(50));
@@ -43,6 +44,7 @@ int main() {
   gl_init(&transientStorage);
 
   while (running) {
+    reload_game_DLL(&transientStorage);
     platform_update_window();
     update_game(renderData, input);
     gl_render();
@@ -60,24 +62,44 @@ void update_game(RenderData *renderDataIn, Input *inputIn) {
 }
 
 void reload_game_DLL(BumpAllocator *transientStorage) {
-  static void *gameDLL;
-  static long long lastEditTimestampGameDLL;
+  static void *gameDLL = nullptr;
+  static long long lastTs = 0;
 
-  long long currentTimestampGameDLL = get_timestamp("game.so");
-  if (currentTimestampGameDLL > lastEditTimestampGameDLL) {
-    if (gameDLL) {
-      bool freeResult = platform_free_dynamic_library(gameDLL);
-      gameDLL = nullptr;
-      LOG_TRACE("Freed game.dll");
-    }
+  long long ts = get_timestamp("game.so");
+  if (ts == 0) {
+    // If your timestamp helper can fail, don't attempt reload
+    return;
   }
+
+  // Only reload if the file actually changed or first load
+  if (gameDLL && ts == lastTs) {
+    return;
+  }
+
+  // unload old
+  if (gameDLL) {
+    platform_free_dynamic_library(gameDLL);
+    gameDLL = nullptr;
+    update_game_ptr = nullptr;
+    LOG_TRACE("Freed game DLL");
+  }
+
+  // copy to temp name
+  // IMPORTANT: copy_file must fully overwrite destination (truncate) and close
+  // it.
   while (!copy_file("game.so", "game_load.so", transientStorage)) {
-    sleep(10);
+    usleep(50 * 1000);
   }
   LOG_TRACE("Copied game.so into game_load.so");
 
+  // load new
+  gameDLL = platform_load_dynamic_library("game_load.so");
+  FN_ASSERT(gameDLL, "dlopen game_load.so failed");
+
   update_game_ptr = (update_game_type *)platform_load_dynamic_function(
       gameDLL, "update_game");
-  FN_ASSERT(update_game_ptr, "Failed to load update_game function");
-  lastEditTimestampGameDLL = currentTimestampGameDLL;
+  FN_ASSERT(update_game_ptr, "Failed to load update_game");
+
+  lastTs = ts;
+  LOG_TRACE("Reloaded game DLL OK (ts=%lld)", ts);
 }

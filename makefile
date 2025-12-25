@@ -17,6 +17,7 @@ WARNINGS := -Wno-writable-strings -Wno-format-security -Wno-deprecated-declarati
 # Includes / libs (edit these to match your project)
 INCLUDES := -Isrc -Ithird_party -Ithird_party/Include
 LIBS     := -lX11 -lGL -ldl -lpthread
+LDFLAGS  := -rdynamic
 
 # Layout
 SRC_DIR  := src
@@ -44,7 +45,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 
 # Link app
 $(APP): $(APP_OBJS)
-	$(CXX) $(CXXFLAGS) $(APP_OBJS) -o $@ $(LIBS)
+	$(CXX) $(CXXFLAGS) $(APP_OBJS) -o $@ $(LDFLAGS) $(LIBS)
 
 # Hot-reload library build:
 # - timestamped build artifact -> atomically moved into game.so

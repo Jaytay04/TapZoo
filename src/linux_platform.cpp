@@ -245,28 +245,30 @@ void *platform_load_gl_function(char *funName) {
 
 void *platform_load_dynamic_library(const char *dll) {
   char path[256] = {};
-  sprintf(path, "./%s", dll);
-  void *lib = dlopen(path, RTLD_NOW);
-  char *errstr = dlerror();
-  if (errstr != NULL) {
-    FN_ASSERT(false, "A dynamic linking error occurred: (%s)\n", errstr);
-  }
-  FN_ASSERT(lib, "Failed to load lib: %s", dll);
+  snprintf(path, sizeof(path), "./%s", dll);
 
+  dlerror(); // clear stale
+  void *lib = dlopen(path, RTLD_NOW | RTLD_GLOBAL);
+  const char *err = dlerror();
+  FN_ASSERT(!err && lib, "dlopen failed: %s", err ? err : "(null)");
   return lib;
 }
 
 void *platform_load_dynamic_function(void *dll, const char *funName) {
+  FN_ASSERT(dll, "Null dll handle for dlsym(%s)", funName);
+  dlerror(); // clear
   void *proc = dlsym(dll, funName);
-  FN_ASSERT(proc, "Failed to load function: %s from lib", funName);
-
+  const char *err = dlerror();
+  FN_ASSERT(!err && proc, "dlsym failed (%s): %s", funName,
+            err ? err : "(null)");
   return proc;
 }
 
 bool platform_free_dynamic_library(void *dll) {
   FN_ASSERT(dll, "No lib supplied!");
-  int freeResult = dlclose(dll);
-  FN_ASSERT(!freeResult, "Failed to dlclose");
-
-  return (bool)freeResult;
+  dlerror(); // clear
+  int rc = dlclose(dll);
+  const char *err = dlerror();
+  FN_ASSERT(rc == 0, "dlclose failed: %s", err ? err : "(null)");
+  return true;
 }
