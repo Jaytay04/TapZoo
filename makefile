@@ -12,7 +12,7 @@ CXX      := g++
 CXXFLAGS := -std=c++20 -O2 -g
 
 # Your warnings (normalized: add -W prefix, remove stray spaces)
-WARNINGS := -Wno-writable-strings -Wno-format-security -Wno-deprecated-declarations -Wno-switch
+WARNINGS := -Wno-writable-strings -Wno-format-security -Wno-deprecated-declarations -Wno-switch -Wno-write-strings
 
 # Includes / libs (edit these to match your project)
 INCLUDES := -Isrc -Ithird_party -Ithird_party/Include

@@ -159,3 +159,18 @@ bool copy_file(const char *fileName, const char *outputName,
 
   return false;
 }
+
+Mat4 orthographic_projection(float left, float right, float top, float bottom) {
+  Mat4 result = {};
+  result.aw = -(right + left) / (right - left);
+  result.bw = (top + bottom) / (top - bottom);
+  result.cw = 0.0f; // Near Plane
+  result[0][0] = 2.0f / (right - left);
+  result[1][1] = 2.0f / (top - bottom);
+  result[2][2] = 1.0f / (1.0f - 0.0f); // Far and Near
+  result[3][3] = 1.0f;
+
+  return result;
+}
+
+Vec2 vec_2(IVec2 v) { return Vec2{(float)v.x, (float)v.y}; }

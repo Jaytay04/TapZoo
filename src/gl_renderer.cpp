@@ -4,6 +4,7 @@
 #include "funlib.h"
 #include "input.h"
 #include "render_interface.h"
+#include <GL/glcorearb.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../third_party/stb_image.h"
@@ -132,6 +133,8 @@ bool gl_init(BumpAllocator *transientStorage) {
     // glUseProgram(glContext.programID);
     glContext.screenSizeID =
         glGetUniformLocation(glContext.programID, "screenSize");
+    glContext.orthoProjectionID =
+        glGetUniformLocation(glContext.programID, "orthoProjection");
 
     // Ensure sampler uses texture unit 0
     /*
@@ -155,10 +158,20 @@ void gl_render() {
   glClearColor(119.0f / 255.0f, 33.0f / 255.0f, 111.0f / 255.0f, 1.0f);
   glClearDepth(0.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
   glViewport(0, 0, input->screenSizeX, input->screenSizeY);
+
+  // copy screen size to the GPU
   Vec2 screenSize = {(float)input->screenSizeX, (float)input->screenSizeY};
   glUniform2fv(glContext.screenSizeID, 1, &screenSize.x);
+
+  OrthographicCamera2D camera = renderData->gameCamera;
+  Mat4 orthoProjection =
+      orthographic_projection(camera.position.x - camera.dimensions.x / 2.0f,
+                              camera.position.x + camera.dimensions.x / 2.0f,
+                              camera.position.y - camera.dimensions.y / 2.0f,
+                              camera.position.y + camera.dimensions.y / 2.0f);
+  glUniformMatrix4fv(glContext.orthoProjectionID, 1, GL_FALSE,
+                     &orthoProjection.ax);
 
   /*
   glUseProgram(glContext.programID);
@@ -173,6 +186,7 @@ void gl_render() {
 
   */
   {
+
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
                     sizeof(Transform) * renderData->transformCount,
                     renderData->transforms);

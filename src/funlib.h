@@ -132,7 +132,68 @@ bool copy_file(const char *fileName, const char *outputName,
 // #############################################################################
 struct Vec2 {
   float x, y;
+
+  Vec2 operator/(float scalar) { return {x / scalar, y / scalar}; }
+
+  Vec2 operator-(Vec2 other) { return {x - other.x, y - other.y}; }
 };
 struct IVec2 {
   int x, y;
 };
+
+Vec2 vec_2(IVec2 v);
+struct Vec4 {
+  union {
+    float values[4];
+    struct {
+      float x;
+      float y;
+      float z;
+      float w;
+    };
+
+    struct {
+      float r;
+      float g;
+      float b;
+      float a;
+    };
+  };
+
+  float &operator[](int idx) { return values[idx]; }
+
+  bool operator==(Vec4 other) {
+    return x == other.x && y == other.y && z == other.z && w == other.w;
+  }
+};
+
+struct Mat4 {
+  union {
+    Vec4 values[4];
+    struct {
+      float ax;
+      float bx;
+      float cx;
+      float dx;
+
+      float ay;
+      float by;
+      float cy;
+      float dy;
+
+      float az;
+      float bz;
+      float cz;
+      float dz;
+
+      float aw;
+      float bw;
+      float cw;
+      float dw;
+    };
+  };
+
+  Vec4 &operator[](int col) { return values[col]; }
+};
+
+Mat4 orthographic_projection(float left, float right, float top, float bottom);

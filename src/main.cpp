@@ -18,6 +18,7 @@ void reload_game_DLL(BumpAllocator *transientStorage);
 
 Input *input = nullptr;
 RenderData *renderData = nullptr;
+GameState *gameState = nullptr;
 
 int main() {
   BumpAllocator transientStorage = Make_Bump_Allocator(MB(50));
@@ -33,6 +34,11 @@ int main() {
     LOG_ERROR("Failed to allocate RenderData")
     return -1;
   }
+  gameState = (GameState *)Bump_Alloc(&persistentStorage, sizeof(GameState));
+  if (!gameState) {
+    LOG_ERROR("Failed to allocate GameState")
+    return -1;
+  }
 
   input->screenSizeX = 1200;
   input->screenSizeY = 700;
@@ -46,7 +52,7 @@ int main() {
   while (running) {
     reload_game_DLL(&transientStorage);
     platform_update_window();
-    update_game(renderData, input);
+    update_game(gameState, renderData, input);
     gl_render();
     platform_swap_buffers();
 
@@ -57,8 +63,9 @@ int main() {
   return 0;
 }
 
-void update_game(RenderData *renderDataIn, Input *inputIn) {
-  update_game_ptr(renderDataIn, inputIn);
+void update_game(GameState *gameStateIn, RenderData *renderDataIn,
+                 Input *inputIn) {
+  update_game_ptr(gameStateIn, renderDataIn, inputIn);
 }
 
 void reload_game_DLL(BumpAllocator *transientStorage) {

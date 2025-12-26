@@ -3,10 +3,11 @@
 #include <GL/glcorearb.h>
 
 struct GLContext {
-  GLuint programID = 0;
-  GLuint textureID = 0;
-  GLuint transformSBOID = 0;
-  GLint screenSizeID = -1;
+  GLuint programID;
+  GLuint textureID;
+  GLuint transformSBOID;
+  GLint screenSizeID;
+  GLuint orthoProjectionID;
 };
 extern GLContext glContext;
 bool gl_init(BumpAllocator *transientStorage);
